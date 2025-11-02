@@ -36,7 +36,12 @@ class KategoriSparepart extends Model
             }
         });
     }
-    public function kategori_komponen(){
-        return $this->belongsTo(KategoriKomponen::class);
+    public function kategoriKomponen()
+    {
+        return $this->belongsTo(KategoriKomponen::class, 'kategori_komponen_id');
+    }
+        public function sparepart()
+    {
+        return $this->hasMany(sparepart::class);
     }
 }

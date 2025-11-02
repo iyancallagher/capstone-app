@@ -35,8 +35,12 @@ class KategoriKomponen extends Model
             }
         });
     }
-    public function kategori_sparepart()
+    public function kategoriSpareparts()
     {
-        return $this->hasOne(KategoriKomponen::class);
+        return $this->hasMany(\App\Models\KategoriSparepart::class, 'kategori_komponen_id');
+    }
+        public function sparepart()
+    {
+        return $this->hasMany(\App\Models\Sparepart::class, 'kategori_sparepart_id');
     }
 }

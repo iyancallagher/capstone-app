@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('number_part')->unique()->nullable();
             $table->string('alternatif_number')->unique()->nullable();
             $table->string('satuan');
-            $table->text('keterangan');
+            $table->text('keterangan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

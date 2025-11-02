@@ -28,7 +28,7 @@ class KategoriSparepartResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('kategori_komponen_id') 
-                ->relationship('kategori_komponen', 'nama_komponen'),
+                ->relationship('kategoriKomponen', 'nama_komponen'),
                 Forms\Components\TextInput::make('kategori_sparepart')
                     ->required()
                     ->placeholder('kategori sparepart')
@@ -46,11 +46,8 @@ class KategoriSparepartResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kategori_komponen.nama_komponen')
-                    ->label('Komponen')
-                    ->formatStateUsing(fn ($record) => $record->kategori_komponen 
-                        ? "{$record->kategori_komponen->nama_komponen} - {$record->kategori_komponen->kode_komponen}" 
-                        : '-')
+                Tables\Columns\TextColumn::make('kategoriKomponen.kode_komponen')
+                    ->label('Kode Komponen')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('kode_prefix')
