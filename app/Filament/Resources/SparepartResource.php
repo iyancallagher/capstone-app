@@ -13,6 +13,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\KategoriSparepart;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
 
 class SparepartResource extends Resource
 {
@@ -24,39 +28,39 @@ class SparepartResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nama_sparepart')
-                    ->placeholder('Masukan Nama Sparepart')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('kategori_sparepart_id')
-                    ->label('Kategori Sparepart')
-                    ->options(function () {
-                        return KategoriSparepart::with('kategoriKomponen') // pastikan relasi di model sesuai!
-                            ->get()
-                            ->mapWithKeys(function ($item) {
-                                $kodeKomponen = $item->kategoriKomponen?->kode_komponen;
-                                $kodePrefix = $item->kode_prefix;
-                                $namaKategori = $item->nama_kategori;
+                TextInput::make('nama_sparepart')
+                ->placeholder('Masukan Nama Sparepart')
+                ->required()
+                ->maxLength(255),
+                Select::make('kategori_sparepart_id')
+                ->label('Kategori Sparepart')
+                ->options(function () {
+                    return KategoriSparepart::with('kategoriKomponen') // pastikan relasi di model sesuai!
+                        ->get()
+                        ->mapWithKeys(function ($item) {
+                            $kodeKomponen = $item->kategoriKomponen?->kode_komponen;
+                            $kodePrefix = $item->kode_prefix;
+                            $namaKategori = $item->nama_kategori;
 
-                                // format: ENG-FLT (FILTER)
-                                return [
-                                    $item->id => "{$kodeKomponen}-{$kodePrefix}{$namaKategori}"
-                                ];
-                            });
+                            // format: ENG-FLT (FILTER)
+                            return [
+                                $item->id => "{$kodeKomponen}-{$kodePrefix}{$namaKategori}"
+                            ];
+                        });
                     })
-                    ->searchable()
-                    ->required()
-                    ->placeholder('Pilih kategori sparepart'),
-                Forms\Components\TextInput::make('number_part')
-                    ->placeholder('Masukan Number Part')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('alternatif_number')
-                    ->placeholder('Opsional')                    
-                    ->maxLength(255),
-                Forms\Components\Select::make('satuan')
-                    ->label('Satuan')
-                    ->options([
+                ->searchable()
+                ->required()
+                ->placeholder('Pilih kategori sparepart'),
+                TextInput::make('number_part')
+                ->placeholder('Masukan Number Part')
+                ->required()
+                ->maxLength(255),
+                TextInput::make('alternatif_number')
+                ->placeholder('Opsional')                    
+                ->maxLength(255),
+                Select::make('satuan')
+                ->label('Satuan')
+                ->options([
                         'pcs' => 'Pcs',
                         'set' => 'Set',
                         'unit' => 'Unit',
@@ -67,12 +71,12 @@ class SparepartResource extends Resource
                         'roll' => 'Roll',
                         'pack' => 'Pack',
                     ])
-                    ->searchable()
-                    ->required(),
-                Forms\Components\Textarea::make('keterangan')
-                    ->placeholder('Tambahkan Keterangan Jika Ada')
-                    ->columnSpanFull()
-                    ->rows(6),
+                ->searchable()
+                ->required(),
+                Textarea::make('keterangan')
+                ->placeholder('Tambahkan Keterangan Jika Ada')
+                ->columnSpanFull()
+                ->rows(6),
             ]);
     }
 
@@ -80,33 +84,35 @@ class SparepartResource extends Resource
     {
         return $table
             ->columns([
-            Tables\Columns\TextColumn::make('kode_sparepart')
-                ->label('Kode & Komponen')
-                ->getStateUsing(function ($record) {
+            TextColumn::make('No')
+            ->label('No')
+            ->rowIndex(),
+            TextColumn::make('kode_sparepart')
+            ->label('Kode & Komponen')
+            ->getStateUsing(function ($record) {
                     $komponen = $record->kategoriSparepart?->kategoriKomponen?->kode_komponen;
                     return "{$record->kode_sparepart}";
                 })
-                ->sortable()
-                ->searchable(),
-
-                Tables\Columns\TextColumn::make('nama_sparepart')
+            ->sortable()
+            ->searchable(),
+                TextColumn::make('nama_sparepart')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('number_part')
+                TextColumn::make('number_part')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('alternatif_number')
+                TextColumn::make('alternatif_number')
                     ->searchable()
                     ->placeholder('Tidak ada'),
-                Tables\Columns\TextColumn::make('satuan')
+                TextColumn::make('satuan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

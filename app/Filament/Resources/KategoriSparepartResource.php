@@ -2,16 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\KategoriSparepartResource\Pages;
 use App\Filament\Resources\KategoriSparepartResource\RelationManagers;
-use App\Models\KategoriSparepart;
+use App\Models\KategoriKomponen;
 use Filament\Forms;
+use App\Filament\Resources\KategoriSparepartResource\Pages;
+use App\Models\KategoriSparepart;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\DeleteAction;
 
 class KategoriSparepartResource extends Resource
 {
@@ -27,16 +35,16 @@ class KategoriSparepartResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('kategori_komponen_id') 
-                ->relationship('kategoriKomponen', 'nama_komponen'),
-                Forms\Components\TextInput::make('kategori_sparepart')
+                Select::make('kategori_komponen_id') 
+                    ->relationship('kategoriKomponen'   , 'nama_komponen'), //KategoriKomponen = nama model nya, nama_komponen =field nya
+                TextInput::make('kategori_sparepart')
                     ->required()
                     ->placeholder('kategori sparepart')
                     ->maxLength(100),
-                Forms\Components\TextInput::make('kode_prefix')
+                TextInput::make('kode_prefix')
                     ->placeholder('Opsional')
                     ->maxLength(255),
-                Forms\Components\Textarea::make('deskripsi')
+                Textarea::make('deskripsi')
                     ->placeholder('Deskripsi Sparepart')
                     ->columnSpanFull(),
             ]);
@@ -46,34 +54,34 @@ class KategoriSparepartResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('kategoriKomponen.kode_komponen')
+                TextColumn::make('kategoriKomponen.kode_komponen')
                     ->label('Kode Komponen')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('kode_prefix')
+                TextColumn::make('kode_prefix')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('kategori_sparepart')
+                TextColumn::make('kategori_sparepart')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('deskripsi')
+                TextColumn::make('deskripsi')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

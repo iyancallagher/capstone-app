@@ -11,6 +11,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -33,14 +35,10 @@ class UnitTipeResource extends Resource
     {
         return $form
             ->schema([
-                Tables\Columns\TextColumn::make('No')
-                    ->label('No')
-                    ->rowIndex()
-                    ->searchable(),
-                Forms\Components\TextInput::make('nama_tipe')
+                TextInput::make('nama_tipe')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('deskripsi')
+                Textarea::make('deskripsi')
                     ->columnSpanFull(),
                     
             ]);
@@ -54,18 +52,19 @@ class UnitTipeResource extends Resource
                 ->label('No')
                 ->rowIndex(),
                 TextColumn::make('nama_tipe')
-                    ->searchable(),
+                ->label('Tipe Unit')
+                ->searchable(),
                 TextColumn::make('deskripsi')
-                    ->searchable()
-                    ->placeholder('Tidak Ada Deskripsi'),
+                ->searchable()
+                ->placeholder('Tidak Ada Deskripsi'),
                 TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                ->dateTime()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
