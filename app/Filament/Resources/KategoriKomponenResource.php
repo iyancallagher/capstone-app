@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\KategoriKomponenResource\Pages;
 use App\Filament\Resources\KategoriKomponenResource\RelationManagers;
+use App\Filament\Resources\KategoriKomponenResource\Pages;
 use App\Models\KategoriKomponen;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +17,7 @@ class KategoriKomponenResource extends Resource
 {
     protected static ?string $model = KategoriKomponen::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     public static function getNavigationGroup(): ?string
     {

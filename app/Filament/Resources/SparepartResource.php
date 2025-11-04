@@ -20,9 +20,17 @@ use Filament\Tables\Columns\TextColumn;
 
 class SparepartResource extends Resource
 {
+    // public static function shouldRegisterNavigation(): bool
+    // {
+    //     return false;
+    // }
     protected static ?string $model = Sparepart::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    public static function getNavigationLabel(): string
+    {
+        return 'Daftar Sparepart';
+    }
 
     public static function form(Form $form): Form
     {
@@ -76,7 +84,22 @@ class SparepartResource extends Resource
                 Textarea::make('keterangan')
                 ->placeholder('Tambahkan Keterangan Jika Ada')
                 ->columnSpanFull()
-                ->rows(6),
+                ->rows(2),
+                Forms\Components\Repeater::make('detailSpareparts')
+                ->relationship('detailSpareparts')
+                ->schema([
+                    Forms\Components\Select::make('jenis_unit_id')
+                        ->label('Jenis Unit')
+                        ->options(\App\Models\JenisUnit::pluck('nama_jenis', 'id'))
+                        ->searchable()
+                        ->required(),
+                    Forms\Components\Textarea::make('catatan')
+                        ->label('Opsional')
+                ])
+                ->columns(2)
+                ->addActionLabel('Tambah')
+                ->columnSpanFull(),
+
             ]);
     }
 
@@ -101,9 +124,25 @@ class SparepartResource extends Resource
                     ->searchable(),
                 TextColumn::make('alternatif_number')
                     ->searchable()
-                    ->placeholder('Tidak ada'),
+                    ->placeholder('Tidak ada')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                     TextColumn::make('jenis_unit')
+                    ->label('Jenis Unit')
+                    ->getStateUsing(function ($record) {
+                        // kalau detailSparepart kosong, kembalikan "-"
+                        if (!$record->detailSpareparts || $record->detailSpareparts->isEmpty()) {
+                            return '-';
+                        }
+                        // ambil semua nama jenis unit dari detail
+                        return $record->detailSpareparts
+                            ->pluck('jenisUnit.nama_jenis')
+                            ->filter()
+                            ->unique()
+                            ->implode(', ');
+                    }),
                 TextColumn::make('satuan')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -154,5 +193,11 @@ class SparepartResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
-    }
+        return parent::getEloquentQuery()
+        ->with(['detailSpareparts' => function ($query) {
+            $query->withTrashed();
+            $query->with('jenisUnit'); // nested eager load // kalau pakai SoftDeletes
+        }]);
+        
+}
 }

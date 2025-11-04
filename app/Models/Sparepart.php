@@ -22,38 +22,58 @@ class Sparepart extends Model
     {
         return $this->belongsTo(KategoriSparepart::class, 'kategori_sparepart_id');
     }
+    
+    public function detailSpareparts()
+    {
+        return $this->hasMany(DetailSparepart::class, 'sparepart_id');
+    }
+    public function jenisUnit()
+{
+    return $this->belongsTo(JenisUnit::class, 'jenis_unit_id');
+}
     protected static function boot()
 {
     parent::boot();
 
     static::creating(function ($sparepart) {
-       // Pastikan kategori_sparepart_id sudah terisi
-            if (!$sparepart->kategori_sparepart_id) {
-                return;
-            }
+        // Pastikan kategori_sparepart_id sudah terisi
+        if (!$sparepart->kategori_sparepart_id) {
+            return;
+        }
 
-            // Ambil kategori sparepart & komponen
-            $kategoriSparepart = \App\Models\KategoriSparepart::with('kategoriKomponen')
-                ->find($sparepart->kategori_sparepart_id);
+        // Ambil kategori_sparepart beserta relasi kategori_komponen
+        $kategoriSparepart = \App\Models\KategoriSparepart::with('kategoriKomponen')
+            ->find($sparepart->kategori_sparepart_id);
 
-            if (!$kategoriSparepart) {
-                return;
-            }
+        if (!$kategoriSparepart) {
+            return;
+        }
 
-            $KategoriKomponen = strtoupper($kategoriSparepart->kategoriKomponen->kode_komponen ?? 'XXX');
-            $kodePrefix = strtoupper($kategoriSparepart->kode_prefix ?? 'XXX');
+        $KategoriKomponen = strtoupper($kategoriSparepart->kategoriKomponen->kode_komponen ?? 'XXX');
+        $kodePrefix = strtoupper($kategoriSparepart->kode_prefix ?? 'XXX');
 
-            // Hitung nomor urut terakhir untuk kombinasi ini
-            $count = self::whereHas('kategoriSparepart', function ($q) use ($kategoriSparepart) {
+        // Ambil kode terakhir (termasuk data yang sudah dihapus)
+        $lastCode = self::whereHas('kategoriSparepart', function ($q) use ($kategoriSparepart) {
                 $q->where('kategori_komponen_id', $kategoriSparepart->kategori_komponen_id)
                   ->where('kode_prefix', $kategoriSparepart->kode_prefix);
-            })->count() + 1;
+            })
+            ->withTrashed() // ikut data soft delete
+            ->orderBy('id', 'desc')
+            ->value('kode_sparepart');
 
-            // Format ke 3 digit
-            $nomor = str_pad($count, 3, '0', STR_PAD_LEFT);
+        // Tentukan nomor berikutnya
+        if ($lastCode) {
+            // Ambil angka terakhir dari format kode, misal: ENG-FIL-022 → 22
+            preg_match('/-(\d+)$/', $lastCode, $matches);
+            $lastNumber = isset($matches[1]) ? (int)$matches[1] : 0;
+            $nomor = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+        } else {
+            $nomor = '001';
+        }
 
-            // Set kode_sparepart otomatis
-            $sparepart->kode_sparepart = "{$KategoriKomponen}-{$kodePrefix}-{$nomor}";
-        });
+        // Set kode_sparepart baru
+        $sparepart->kode_sparepart = "{$KategoriKomponen}-{$kodePrefix}-{$nomor}";
+    });
 }
+
 }

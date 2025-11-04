@@ -29,6 +29,7 @@ class WarehousePanelProvider extends PanelProvider
             ->brandLogo(asset('asset/logotext.png'))
             ->favicon(asset('asset/logo.png'))
             ->brandLogoHeight('40px')
+            ->topNavigation()
             ->login()
             ->colors([
                 'primary' => Color::Amber,

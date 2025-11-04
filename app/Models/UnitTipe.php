@@ -14,4 +14,8 @@ class UnitTipe extends Model
     {
         return $this->hasOne(JenisUnit::class);
     }
+    public function DetailSparepart()
+    {
+        return $this->hasMany(DetailSparepart::class);
+    }
 }

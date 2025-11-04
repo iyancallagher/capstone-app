@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\JenisUnitResource\Pages;
-use App\Filament\Resources\JenisUnitResource\RelationManagers;
-use App\Models\JenisUnit;
+use App\Filament\Resources\DetailSparepartResource\Pages;
+use App\Filament\Resources\DetailSparepartResource\RelationManagers;
+use App\Models\DetailSparepart;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,31 +13,29 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class JenisUnitResource extends Resource
+class DetailSparepartResource extends Resource
 {
-    protected static ?string $model = JenisUnit::class;
+        public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+    protected static ?string $model = DetailSparepart::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-truck';
-    public static function getNavigationGroup(): ?string
-    {
-        return 'Table Master'; // misalkan Sparepart masuk sini
-    }
-        public static function getNavigationLabel(): string
-    {
-        return 'Daftar Unit';
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('unit_tipe_id') 
-                ->relationship('unit_tipe', 'nama_tipe'),
-                Forms\Components\TextInput::make('nama_jenis')
+                Forms\Components\TextInput::make('sparepart_id')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tahun')
-                    ->maxLength(255),
+                    ->numeric(),
+                Forms\Components\TextInput::make('jenis_unit_id')
+                    ->required()
+                    ->numeric(),
+                Forms\Components\Textarea::make('catatan')
+                    ->required()
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -45,18 +43,12 @@ class JenisUnitResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('No')
-                    ->label('No')
-                    ->rowIndex()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('unit_tipe.nama_tipe')
-                    ->label('Nama Tipe')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nama_jenis')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tahun')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('sparepart_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('jenis_unit_id')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -74,6 +66,7 @@ class JenisUnitResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -95,9 +88,10 @@ class JenisUnitResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListJenisUnits::route('/'),
-            'create' => Pages\CreateJenisUnit::route('/create'),
-            'edit' => Pages\EditJenisUnit::route('/{record}/edit'),
+            'index' => Pages\ListDetailSpareparts::route('/'),
+            'create' => Pages\CreateDetailSparepart::route('/create'),
+            'view' => Pages\ViewDetailSparepart::route('/{record}'),
+            'edit' => Pages\EditDetailSparepart::route('/{record}/edit'),
         ];
     }
 

@@ -17,5 +17,8 @@ class JenisUnit extends Model
     {
         return $this->belongsTo(UnitTipe::class);
     }
-
+    public function detailSparepart()
+    {
+        return $this->hasMany(DetailSparepart::class, 'jenis_unit_id');
+    }
 }
